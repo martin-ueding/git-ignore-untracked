@@ -8,12 +8,60 @@ Queries git for untracked files and adds them to the ignored files list.
 """
 
 import argparse
+import os.path
 import subprocess
+import sys
 
 __docformat__ = "restructuredtext en"
 
 def main():
     options = _parse_args()
+
+    ignorefilename = ".gitignore"
+
+    ignores = []
+    ignores_new = []
+
+    # Read the current ignore file into the list.
+    if os.path.isfile(ignorefilename):
+        with open(ignorefilename) as f:
+            for line in f:
+                ignores.append(line)
+
+    # Query git for the untracked files. Use the ``--porcelain`` option since
+    # this is guaranteed to be stable.
+    try:
+        output = subprocess.check_output(["git", "status", "--porcelain"])
+
+        for line in output.split(b"\n"):
+            if not line.startswith(b"??"):
+                continue
+
+            # FIXME This assumes that the encoding is utf-8. git is encoding
+            # agnostic and so should be this script.
+            filename = line[3:].decode("utf-8")
+
+            if filename == ignorefilename:
+                continue
+
+
+            if not filename in ignores:
+                ignores_new.append(filename)
+    except subprocess.CalledProcessError as e:
+        print(e)
+        raise e
+
+    if len(ignores_new) == 0:
+        sys.exit(0)
+
+    if options.dry_run:
+        print("Would append the following entries:")
+        print("\n".join(ignores_new))
+    else:
+        with open(ignorefilename, "w") as f:
+            for ignore in ignores + ignores_new:
+                f.write(ignore)
+                f.write("\n")
 
 
 def _parse_args():
@@ -25,7 +73,7 @@ def _parse_args():
     """
     parser = argparse.ArgumentParser(description=__doc__)
     #parser.add_argument("args", metavar="N", type=str, nargs="*", help="Positional arguments.")
-    #parser.add_argument("", dest="", type="", default=, help=)
+    parser.add_argument("-n", "--dry-run", dest="dry_run", action="store_true", help="Perform a dry run only.")
     #parser.add_argument("--version", action="version", version="<the version>")
 
     return parser.parse_args()
