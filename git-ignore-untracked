@@ -63,14 +63,14 @@ def main():
                 f.write(ignore)
                 f.write("\n")
 
-    if options.commit:
-        try:
-            subprocess.check_call(["git", "add", ignorefile])
-            subprocess.check_call(["git", "commit", ignorefile, "-m",
-                                   options.message])
-        except subprocess.CalledProcessError as e:
-            print(e)
-            raise e
+        if options.commit:
+            try:
+                subprocess.check_call(["git", "add", ignorefile])
+                subprocess.check_call(["git", "commit", ignorefile, "-m",
+                                       options.message])
+            except subprocess.CalledProcessError as e:
+                print(e)
+                raise e
 
 
 def _parse_args():
