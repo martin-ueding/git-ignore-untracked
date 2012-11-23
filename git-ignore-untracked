@@ -63,6 +63,14 @@ def main():
                 f.write(ignore)
                 f.write("\n")
 
+    if options.commit:
+        try:
+            subprocess.check_call(["git", "add", ignorefile])
+            subprocess.check_call(["git", "commit", ignorefile])
+        except subprocess.CalledProcessError as e:
+            print(e)
+            raise e
+
 
 def _parse_args():
     """
@@ -74,6 +82,8 @@ def _parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
     #parser.add_argument("args", metavar="N", type=str, nargs="*", help="Positional arguments.")
     parser.add_argument("-n", "--dry-run", dest="dry_run", action="store_true", help="Perform a dry run only.")
+    parser.add_argument("-c", "--commit", dest="commit", action="store_true", help="Commits the .gitignore automatically.")
+    parser.add_argument("-m", "--message", dest="message", type=str, default="Ignore all other files", help="Commit message (default: “%(default)s”).")
     #parser.add_argument("--version", action="version", version="<the version>")
 
     return parser.parse_args()
