@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2012 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2012-2013 Martin Ueding <dev@martin-ueding.de>
 
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -41,6 +41,8 @@ def main():
     if os.path.isfile(ignorefilename):
         with open(ignorefilename) as f:
             for line in f:
+                if len(line.strip()) == 0:
+                    continue
                 ignores.append(line)
 
     # Query git for the untracked files. Use the ``--porcelain`` option since
@@ -75,7 +77,9 @@ def main():
     else:
         with open(ignorefilename, "w") as f:
             for ignore in ignores + ignores_new:
-                f.write(ignore)
+                if len(ignore.strip()) == 0:
+                    continue
+                f.write(ignore.strip())
                 f.write("\n")
 
         if options.commit:
