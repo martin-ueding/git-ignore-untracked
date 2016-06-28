@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2012-2013 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2012-2013, 2016 Martin Ueding <dev@martin-ueding.de>
 
 """
 Queries git for untracked files and adds them to the ignored files list.
@@ -19,14 +19,16 @@ __docformat__ = "restructuredtext en"
 def main():
     options = _parse_args()
 
+    top_dir = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode().strip()
     ignorefilename = ".gitignore"
+    ignorepath = os.path.join(top_dir, ignorefilename)
 
     ignores = []
     ignores_new = []
 
     # Read the current ignore file into the list.
-    if os.path.isfile(ignorefilename):
-        with open(ignorefilename) as f:
+    if os.path.isfile(ignorepath):
+        with open(ignorepath) as f:
             for line in f:
                 if len(line.strip()) == 0:
                     continue
@@ -45,7 +47,7 @@ def main():
             # agnostic and so should be this script.
             filename = line[3:].decode("utf-8")
 
-            if filename == ignorefilename:
+            if os.path.join(top_dir, filename) == ignorepath:
                 continue
 
 
@@ -62,7 +64,7 @@ def main():
         print("Would append the following entries:")
         print("\n".join(ignores_new))
     else:
-        with open(ignorefilename, "w") as f:
+        with open(ignorepath, "w") as f:
             for ignore in ignores + ignores_new:
                 if len(ignore.strip()) == 0:
                     continue
@@ -71,8 +73,8 @@ def main():
 
         if options.commit:
             try:
-                subprocess.check_call(["git", "add", ignorefilename])
-                subprocess.check_call(["git", "commit", ignorefilename, "-m",
+                subprocess.check_call(["git", "add", ignorepath])
+                subprocess.check_call(["git", "commit", ignorepath, "-m",
                                        options.message])
             except subprocess.CalledProcessError as e:
                 print(e)
