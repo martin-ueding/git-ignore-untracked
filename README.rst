@@ -1,4 +1,4 @@
-.. Copyright © 2012-2014, 2016-2017 Martin Ueding <dev@martin-ueding.de>
+.. Copyright © 2012-2014, 2016-2017 Martin Ueding <martin-ueding.de>
 
 ####################
 git-ignore-untracked

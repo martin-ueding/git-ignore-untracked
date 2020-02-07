@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2012-2013, 2016 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2012-2013, 2016 Martin Ueding <martin-ueding.de>
 
 """
 Queries git for untracked files and adds them to the ignored files list.
